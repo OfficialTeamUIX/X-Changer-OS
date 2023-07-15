@@ -1,0 +1,178 @@
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
+
+ /* 2003-01-07  andy@warmcat.com  Created
+ */
+
+#include "boot.h"
+#include "BootFlash.h"
+#include "memory_layout.h"
+
+void DisplayFlashProgressBar(int, int, unsigned long);
+
+// Please keep in order by ID.
+const KNOWN_FLASH_TYPE aknownflashtypesDefault[] = {
+	{ 0x01, 0xa4, "AMD - Am29F040B",0x80000 },
+	{ 0x01, 0xad, "AMD - Am29F016", 0x200000 },
+	{ 0x01, 0xda, "AMD - Am29LV800B", 0x100000 },
+	{ 0x01, 0xd5, "AMD - Am29F080B",0x100000 },
+	{ 0x01, 0x4f, "X-Changer Prototype",0x40000 },
+	{ 0x04, 0xd5, "Fujitsu - MBM29F080A",0x100000 },
+	{ 0x20, 0xb0, "ST - M29F002BT",0x40000 },
+	{ 0x20, 0xe3, "X-Changer",0x40000},
+	{ 0x20, 0xf1, "ST - M29F080A",0x100000 },
+	{ 0x89, 0xa6, "Sharp LHF08CH1",0x100000 },
+	{ 0xad, 0xb0, "Hynix - HY29F002TT-90",0x40000 },
+	{ 0xad, 0xd5, "Hynix - HY29F080",0x100000 },
+	{ 0xbf, 0x61, "SST SST49LF020",0x40000 },
+	{ 0xbf, 0xd7, "X-Changer",0x40000 },
+	{ 0xc2, 0x36, "Macronix - MX29F022NTPC",0x40000 },
+	{ 0xda, 0x0b, "Winbond - W49F002U",0x40000 },
+	{ 0xda, 0x8c, "Winbond W49F020",0x40000 },
+	{ 0, 0, "", 0 } // terminator
+};
+
+ // callback to show progress
+bool BootFlashUserInterface(void * pvoidObjectFlash, ENUM_EVENTS ee, u32 dwPos, u32 dwExtent) {
+	if(ee==EE_ERASE_UPDATE){
+		// DisplayFlashProgressBar(dwPos,dwExtent,0xffffff00);
+		//DisplayFlashProgressBar(dwPos,dwExtent,0xffffffff);
+		DisplayFlashProgressBar(dwPos,dwExtent,0xff000000+ERASEPBAR);
+	}
+	else if(ee==EE_PROGRAM_UPDATE){
+		// DisplayFlashProgressBar(dwPos,dwExtent,0xff00ff00);
+		//DisplayFlashProgressBar(dwPos,dwExtent,0xffff0000); 
+		DisplayFlashProgressBar(dwPos,dwExtent,0xff000000+FLASHPBAR);
+	}
+	return true;
+}
+ 
+/* 
+ // callback to show progress
+bool BootFlashUserInterface(void * pvoidObjectFlash, ENUM_EVENTS ee, u32 dwPos, u32 dwExtent) {
+	if(ee==EE_ERASE_UPDATE){
+		DisplayFlashProgressBar(dwPos,dwExtent,0xffffff00);
+	}
+	else if(ee==EE_PROGRAM_UPDATE){
+		DisplayFlashProgressBar(dwPos,dwExtent,0xff00ff00);
+	}
+	return true;
+}
+*/
+
+void DisplayFlashProgressBar(int currentVal, int maxVal, unsigned long color) {
+        int x,y,l,w,h,m;
+        u32 *fb=(u32*)FB_START;
+
+        if(maxVal<2){
+                return;
+        }
+
+        w=vmode.width;
+        h=vmode.height;
+        l=w-100;
+        y=h-100;
+        m=((w-150)>>2)*currentVal/maxVal;
+        m*=4;
+        m+=50;
+        for(x=50;x<l;x++){
+                fb[y*w+x]=0xffffffff;
+                fb[(y+1)*w+x]=0xffffffff;
+                if(x>55 && x<m){
+                        int z;
+                        for(z=5;z<45;z++){
+                                fb[(y+z)*w+x]=color;
+                        }
+
+                }
+                fb[(y+50)*w+x]=0xffffffff;
+                fb[(y+51)*w+x]=0xffffffff;
+        }
+        for(;y<h-50;y++){
+                fb[y*w+51]=0xffffffff;
+                fb[y*w+50]=0xffffffff;
+                fb[y*w+l-1]=0xffffffff;
+                fb[y*w+l-2]=0xffffffff;
+        }
+}
+	// if things go well, we won't be coming back from this
+	// note this is copied to RAM, and the flash will be changed during its operation
+	// therefore no library code nor interrupts can be had
+
+int BootReflashAndReset(u8 *pbNewData, u32 dwStartOffset, u32 dwLength)
+{
+	OBJECT_FLASH of;
+	bool fMore=true;
+	u32 address;
+	int n;
+
+	// prep our flash object with start address and params
+	of.m_pbMemoryMappedStartAddress=(u8 *)LPCFlashadress;
+	of.m_dwStartOffset=dwStartOffset;
+	of.m_dwLengthUsedArea=dwLength;
+	of.m_pcallbackFlash=BootFlashUserInterface;
+
+	// check device type and parameters are sane
+	if(!BootFlashGetDescriptor(&of, (KNOWN_FLASH_TYPE *)&aknownflashtypesDefault[0])) return 1; // unable to ID device - fail
+	if(!of.m_fIsBelievedCapableOfWriteAndErase) return 2; // seems to be write-protected - fail
+	if(of.m_dwLengthInBytes<(dwStartOffset+dwLength)) return 3; // requested layout won't fit device - sanity check fail
+	
+	// committed to reflash now
+	while(fMore) {
+		ClearScreen();
+		printk("\n\n\n\n\n\n\n\n\n\n");
+		printk("\n                    Flashing Bios. Do not turn off XBOX ...\n");
+		if(BootFlashEraseMinimalRegion(&of)) {
+			if(BootFlashProgram(&of, pbNewData)) {
+				fMore=false;  // good situation
+			}
+		}
+		//if (fMore) printk("\n                    Error: %s\n", of.m_szAdditionalErrorInfo);
+		
+		printk("                    Verifying ... ");
+		for (address=0; address < dwLength; address++) if (pbNewData[address] != GetByteFromFlash(address)) fMore = true;
+		if (fMore) {
+			printk("Failed! Press A to retry.\n");
+			while ((risefall_xpad_BUTTON(TRIGGER_XPAD_KEY_A) != 1)) wait_ms(100);
+		}
+		else printk("OK!\n");
+	}
+	
+	printk("\n                    XBOX will reboot in ");
+	for (n=5; n>0; n--) {
+	  printk("%d ... ", n);
+	  wait_ms(1000);
+	}
+	printk("rebooting now!");
+	wait_ms(250);
+	
+	#ifndef NOANI_MENU
+	  I2CTransmitWord(0x10, 0x1b00 + ( I2CTransmitByteGetReturn(0x10, 0x1b) & 0xfb )); // clear noani-bit
+	#endif
+	#ifdef NOANI_MENU
+	  I2CTransmitWord(0x10, 0x1b00 + ( I2CTransmitByteGetReturn(0x10, 0x1b) | 0x04 )); // set noani-bit
+	#endif
+	I2CTransmitWord(0x10, 0x0201); // start new Bios :-)
+	while(1);
+
+	return 0; // keep compiler happy
+}
+
+bool WriteStatusRegister( u8 value ){
+  OBJECT_FLASH of;
+  of.m_pbMemoryMappedStartAddress = (u8 *)LPCFlashadress;
+  return AccessStatusRegister(&of, value);
+}
+
+u8 GetByteFromFlash(int myaddress) {
+  OBJECT_FLASH of;
+  of.m_pbMemoryMappedStartAddress = (u8 *)LPCFlashadress;
+  return xGetByteFromFlash(&of, myaddress);
+}
+

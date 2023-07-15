@@ -1,0 +1,16 @@
+/BootVgaInitialization.c/1.61/Sat Dec 11 23:44:39 2004//
+/BootVgaInitialization.h/1.3/Sun Nov 21 23:39:02 2004//
+/BootVideo.h/1.11/Sun Nov 21 23:39:02 2004//
+/BootVideoHelpers.c/1.21/Mon Jan 24 18:14:33 2005//
+/Makefile/1.8/Fri Sep 10 17:32:27 2004//
+/VideoInitialization.c/1.23/Sun Nov 21 23:48:27 2004//
+/VideoInitialization.h/1.9/Thu Mar  4 15:08:00 2004//
+/conexant.c/1.8/Tue Nov  9 23:14:30 2004//
+/conexant.h/1.3/Tue Nov  9 23:14:31 2004//
+/encoder.h/1.5/Fri Nov  5 21:47:05 2004//
+/focus.c/1.11/Fri Nov  5 21:47:05 2004//
+/focus.h/1.3/Thu Nov  4 20:18:56 2004//
+/xcalibur-regs.h/1.2/Thu Nov  4 20:18:56 2004//
+/xcalibur.c/1.3/Fri Nov  5 21:47:05 2004//
+/xcalibur.h/1.4/Thu Nov  4 20:18:56 2004//
+D
