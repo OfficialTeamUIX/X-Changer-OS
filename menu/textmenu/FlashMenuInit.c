@@ -26,8 +26,21 @@ TEXTMENU* FlashMenuInit(void) {
    			char *driveName=malloc(sizeof(char)*32);
 			itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
 			memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
-                        sprintf(itemPtr->szCaption,"Flash Bios from CD-ROM");
+                        sprintf(itemPtr->szCaption,"Flash Bank A from CD/DVD");
 			itemPtr->functionPtr= FlashBiosFromCD;
+    			itemPtr->functionDataPtr = malloc(sizeof(int));
+                        *(int*)itemPtr->functionDataPtr = i;
+			TextMenuAddItem(menuPtr, itemPtr);
+		}
+	}
+	
+	for (i=0; i<2; ++i) {
+		if (tsaHarddiskInfo[i].m_fDriveExists && tsaHarddiskInfo[i].m_fAtapi) {
+   			char *driveName=malloc(sizeof(char)*32);
+			itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
+			memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
+                        sprintf(itemPtr->szCaption,"Flash Bank B from CD/DVD");
+			itemPtr->functionPtr= FlashBiosFromCD2;
     			itemPtr->functionDataPtr = malloc(sizeof(int));
                         *(int*)itemPtr->functionDataPtr = i;
 			TextMenuAddItem(menuPtr, itemPtr);
@@ -36,8 +49,15 @@ TEXTMENU* FlashMenuInit(void) {
 	
 	itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
 	memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
-	strcpy(itemPtr->szCaption, "Flash Bios via Network");
+	strcpy(itemPtr->szCaption, "Flash Bank A via Network");
 	itemPtr->functionPtr= NetworkFlashBios;
+	itemPtr->functionDataPtr = NULL;
+	TextMenuAddItem(menuPtr, itemPtr);
+
+	itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
+	memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
+	strcpy(itemPtr->szCaption, "Flash Bank B via Network");
+	itemPtr->functionPtr= NetworkFlashBios2;
 	itemPtr->functionDataPtr = NULL;
 	TextMenuAddItem(menuPtr, itemPtr);
 	
@@ -53,6 +73,13 @@ TEXTMENU* FlashMenuInit(void) {
 			TextMenuAddItem(menuPtr, itemPtr);
 		}
 	}
+	
+	itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
+	memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
+	strcpy(itemPtr->szCaption, "Update OS via Network");
+	itemPtr->functionPtr= NetworkUpdate;
+	itemPtr->functionDataPtr = NULL;
+	TextMenuAddItem(menuPtr, itemPtr);
 	
 	return menuPtr;
 }

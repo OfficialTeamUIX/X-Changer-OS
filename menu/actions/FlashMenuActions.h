@@ -9,5 +9,8 @@
 #include "include/config.h"
 
 void FlashBiosFromCD(void *cdromId);
+void FlashBiosFromCD2(void *cdromId);
 void UpdateFlashFromCD(void *cdromId);
 void NetworkFlashBios(void *dummy);
+void NetworkFlashBios2(void *dummy);
+void NetworkUpdate(void *dummy);

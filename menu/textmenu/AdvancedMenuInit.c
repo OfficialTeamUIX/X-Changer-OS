@@ -8,51 +8,64 @@
  ***************************************************************************/
 
 #include "include/boot.h"
+#include "BootIde.h"
 #include "TextMenu.h"
 
-#include "VideoInitialization.h"
-
-TEXTMENU *LEDMenuInit(void) {
+TEXTMENU* AdvancedMenuInit(void) {
 	TEXTMENUITEM *itemPtr;
 	TEXTMENU *menuPtr;
+	int i=0;
 
 	menuPtr = (TEXTMENU*)malloc(sizeof(TEXTMENU));
 	memset(menuPtr,0x00,sizeof(TEXTMENU));
-	strcpy(menuPtr->szCaption, "LED Control Menu");
-
+	strcpy(menuPtr->szCaption, "Advanced Menu");
+	
+	//Linux Boot Menu moved from Iconmenu
 	itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
 	memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
-	strcpy(itemPtr->szCaption, "RED");
-	itemPtr->functionPtr=(void*)I2cSetFrontpanelLed;
-	itemPtr->functionDataPtr = (u8*)(I2C_LED_RED0 | I2C_LED_RED1 | I2C_LED_RED2 | I2C_LED_RED3 );
+	strcpy(itemPtr->szCaption, "Linux Boot Menu");
+	itemPtr->functionPtr=DrawChildTextMenu;
+	itemPtr->functionDataPtr = (void *)LinuxMenuInit();
+	TextMenuAddItem(menuPtr, itemPtr);
+	
+	//LED control menu
+	itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
+	memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
+	strcpy(itemPtr->szCaption, "LED Control Menu");
+	itemPtr->functionPtr=DrawChildTextMenu;
+	itemPtr->functionDataPtr = (void *)LEDMenuInit();
+	TextMenuAddItem(menuPtr, itemPtr);
+	
+	//VIDEO SETTINGS MENU
+	itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
+	memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
+	strcpy(itemPtr->szCaption, "Video Settings");
+	itemPtr->functionPtr=DrawChildTextMenu;
+	itemPtr->functionDataPtr = (void *)VideoMenuInit();
 	TextMenuAddItem(menuPtr, itemPtr);
 
+	//HDD MENU
 	itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
 	memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
-	strcpy(itemPtr->szCaption, "GREEN");
-	itemPtr->functionPtr=(void*)I2cSetFrontpanelLed;
-	itemPtr->functionDataPtr = (u8*)(I2C_LED_GREEN0 | I2C_LED_GREEN1 | I2C_LED_GREEN2 | I2C_LED_GREEN3 );
+	strcpy(itemPtr->szCaption, "Hdd Menu");
+	itemPtr->functionPtr=DrawChildTextMenu;
+	itemPtr->functionDataPtr = (void *)HddMenuInit();
 	TextMenuAddItem(menuPtr, itemPtr);
-
+	
+#ifdef FLASH
+	//FLASH MENU
 	itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
 	memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
-	strcpy(itemPtr->szCaption, "ORANGE");
-	itemPtr->functionPtr=(void*)I2cSetFrontpanelLed;
-	itemPtr->functionDataPtr = (u8*)(I2C_LED_RED0 | I2C_LED_RED1 | I2C_LED_RED2 | I2C_LED_RED3 | I2C_LED_GREEN0 | I2C_LED_GREEN1 | I2C_LED_GREEN2 | I2C_LED_GREEN3);
+	strcpy(itemPtr->szCaption, "Flash Menu");
+	itemPtr->functionPtr=DrawChildTextMenu;
+	itemPtr->functionDataPtr = (void *)FlashMenuInit();
 	TextMenuAddItem(menuPtr, itemPtr);
-
+#endif
 	itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
 	memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
-	strcpy(itemPtr->szCaption, "Cycle");
-	itemPtr->functionPtr=(void*)I2cSetFrontpanelLed;
-	itemPtr->functionDataPtr = (u8*)(I2C_LED_RED0 | I2C_LED_GREEN1 | I2C_LED_RED2 |I2C_LED_GREEN2 );
-	TextMenuAddItem(menuPtr, itemPtr);
-
-	itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
-	memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
-	strcpy(itemPtr->szCaption, "X-Changer default");
-	itemPtr->functionPtr=(void*)I2cSetFrontpanelLed;
-	itemPtr->functionDataPtr = (u8*)(I2C_LED_RED0);
+	strcpy(itemPtr->szCaption, "Reset Menu");
+	itemPtr->functionPtr=DrawChildTextMenu;
+	itemPtr->functionDataPtr = (void *)ResetMenuInit();
 	TextMenuAddItem(menuPtr, itemPtr);
 	
 	return menuPtr;

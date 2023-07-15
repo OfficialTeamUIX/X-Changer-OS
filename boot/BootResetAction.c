@@ -24,6 +24,8 @@
 
 JPEG jpegBackdrop;
 
+int GlobalExpectedFlashFileSize;
+
 int nTempCursorMbrX, nTempCursorMbrY;
 
 extern volatile int nInteruptable;
@@ -52,7 +54,7 @@ extern void BootResetAction ( void ) {
 	u8 mytest;
 	mytest = I2CTransmitByteGetReturn(0x10, 0x11);
 	if ((mytest & 0x20) == 0x20) {
-	  WriteStatusRegister(0x1);      // Boot User Bios
+	WriteToIO(0x1912, 0x02);	// switch to 512k user bank
           #ifndef NOANI
 	    I2CTransmitWord(0x10, 0x1b00 + ( I2CTransmitByteGetReturn(0x10, 0x1b) & 0xfb )); // clear noani-bit
 	  #endif

@@ -83,6 +83,7 @@ OBJECTS-CROM += $(TOPDIR)/obj/IconMenu.o
 OBJECTS-CROM += $(TOPDIR)/obj/IconMenuInit.o
 OBJECTS-CROM += $(TOPDIR)/obj/TextMenu.o
 OBJECTS-CROM += $(TOPDIR)/obj/TextMenuInit.o
+OBJECTS-CROM += $(TOPDIR)/obj/AdvancedMenuInit.o
 OBJECTS-CROM += $(TOPDIR)/obj/LEDMenuInit.o
 OBJECTS-CROM += $(TOPDIR)/obj/LinuxMenuInit.o
 OBJECTS-CROM += $(TOPDIR)/obj/VideoMenuInit.o
@@ -173,9 +174,9 @@ BOOT_ETH_DIR = boot_eth/ethboot
 BOOT_ETH_SUBDIRS = ethsubdirs
 endif
 
-all: clean copyfor16 16 resources $(BOOT_ETH_SUBDIRS) cromsubdirs xromwell.xbe vmlboot $(BOOT_ETH_DIR) cromwell.bin imagecompress os16 
+all: clean copyfor16 cp16 resources $(BOOT_ETH_SUBDIRS) cromsubdirs xromwell.xbe vmlboot $(BOOT_ETH_DIR) cromwell.bin imagecompress os16 
  
-16b: clean copyfor16b 16b resources $(BOOT_ETH_SUBDIRS) cromsubdirs xromwell.xbe vmlboot $(BOOT_ETH_DIR) cromwell.bin imagecompress 0s16b
+16b: clean copyfor16b cp16b resources $(BOOT_ETH_SUBDIRS) cromsubdirs xromwell.xbe vmlboot $(BOOT_ETH_DIR) cromwell.bin imagecompress 0s16b
 
 ifeq ($(ETHERBOOT), yes)
 ethsubdirs: $(patsubst %, _dir_%, $(ETH_SUBDIRS))
@@ -192,28 +193,34 @@ dummy:
 copyfor16:
 	cp boot_rom/2bBootStartup16.S boot_rom/2bBootStartup.S
 	
-16:
-	cp menu/iconmenu/IconMenu16.c menu/iconmenu/IconMenu.c
+cp16:
+	cp menu/textmenu/TextMenuInit16.c menu/textmenu/TextMenuInit.c
 
 copyfor16b:
 	cp boot_rom/2bBootStartup16b.S boot_rom/2bBootStartup.S
 	
-16b:
-	cp menu/iconmenu/IconMenu16b.c menu/iconmenu/IconMenu.c
+cp16b:
+	cp menu/textmenu/TextMenuInit16b.c menu/textmenu/TextMenuInit.c
 	
 os16:
-	cp image/cromwell.bin os16.bin
+	mv image/cromwell.bin os16.bin
 
 0s16b:
-	cp image/cromwell.bin os16b.bin
+	mv image/cromwell.bin os16b.bin
 
 resources:
 	# Background
 	${LD} -r --oformat elf32-i386 -o $(TOPDIR)/obj/backdrop.elf -T $(TOPDIR)/scripts/backdrop.ld -b binary $(TOPDIR)/pics/backdrop.jpg	
 
+totalclean: clean
+	rm -f $(TOPDIR)/os16.bin
+	rm -f $(TOPDIR)/os16b.bin
+
 clean:
 	find . \( -name '*.[oas]' -o -name core -o -name '.*.flags' \) -type f -print \
 		| grep -v lxdialog/ | xargs rm -f
+	rm -f $(TOPDIR)/menu/textmenu/TextMenuInit.c
+	rm -f $(TOPDIR)/boot_rom/2bBootStartup.S
 	rm -f $(TOPDIR)/obj/*.gz 
 	rm -f $(TOPDIR)/obj/*.bin 
 	rm -f $(TOPDIR)/obj/*.elf

@@ -18,27 +18,26 @@
 void IconMenuInit(void) {
 	ICON *iconPtr=NULL;
 	
+/*	
 	iconPtr = (ICON *)malloc(sizeof(ICON));
 	iconPtr->iconSlot = ICON_SOURCE_SLOT0;
 	iconPtr->szCaption = "Boot Original Bios";
-	//iconPtr->szCaption = "";
 	iconPtr->functionPtr = BootOriginalBios;
 	AddIcon(iconPtr);
 
 	iconPtr = (ICON *)malloc(sizeof(ICON));
 	iconPtr->iconSlot = ICON_SOURCE_SLOT1;
 	iconPtr->szCaption = "Boot Modbios";
-	//iconPtr->szCaption = "";
 	iconPtr->functionPtr = BootModBios;
 	selectedIcon = iconPtr;
 	AddIcon(iconPtr);
-	
+*/	
 	iconPtr = (ICON *)malloc(sizeof(ICON));
-	iconPtr->iconSlot = ICON_SOURCE_SLOT2;
-	iconPtr->szCaption = "Advanced";
-	//iconPtr->szCaption = "";
+	iconPtr->iconSlot = ICON_SOURCE_SLOT6;
+	iconPtr->szCaption = "test";
 	iconPtr->functionPtr = AdvancedMenu;
 	iconPtr->functionDataPtr = (void *)TextMenuInit();
+	selectedIcon = iconPtr;
 	AddIcon(iconPtr);
 }
 	

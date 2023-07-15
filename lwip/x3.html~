@@ -5,7 +5,7 @@
 <META http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <STYLE TYPE="text/css" MEDIA=screen>
 <!--
-  body { background-color: #000000; color: black; text-align: center; margin-right: 110px; background-image: url("/1"); background-repeat: no-repeat; background-position: center center; }
+  body { background-color: #000000; color: black; text-align: center; margin-right: 110px; background-image: url("/1"); background-repeat: repeat; background-position: center center; }
   div { color: #000033; font-size: 14px; font-family: "Helvetica Neue", Helvetica, Arial, Sans-serif; padding: 10px}
   h1 { color: #000033; font-size: 24px; font-family: "Helvetica Neue", Helvetica, Arial, Sans-serif; }
   a { color: #000088; text-decoration: none; }
@@ -20,7 +20,7 @@
 </DIV>
 
 <DIV><font color="#FFFFFF"><font size="5"> <strong>Use the form below to flash the BIOS 
-  of your X-Changer via webserver.<br> Your bios needs to exactly be 256k </strong></DIV>
+  of your X-Changer via webserver.<br> Your bios needs to exactly be 256k for Bank A and 512k for Bank B</strong></DIV>
 
 <DIV>
 <FORM METHOD="POST" ENCTYPE="multipart/form-data" ACTION="/0">

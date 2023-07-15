@@ -36,7 +36,7 @@ void BootOriginalBios(void *data) {
 	while(1);
 }	
 
-// Booting 256k Modbios
+// Booting Modbios
 void BootModBios(void *data) {
 	WriteToIO(0x1912, 0x01);	// switch to 256k user bank
 	#ifndef NOANI_MENU
@@ -47,23 +47,6 @@ void BootModBios(void *data) {
 	#endif
 	I2CTransmitWord(0x10, 0x0201);   // reset XBOX
 	while(1);
-}
-
-// Booting 512k Modbios
-void BootModBios(void *data) {
-	WriteToIO(0x1912, 0x02);	// switch to 512k user bank
-	#ifndef NOANI_MENU
-	  I2CTransmitWord(0x10, 0x1b00 + ( I2CTransmitByteGetReturn(0x10, 0x1b) & 0xfb )); // clear noani-bit
-	#endif
-	#ifdef NOANI_MENU
-	  I2CTransmitWord(0x10, 0x1b00 + ( I2CTransmitByteGetReturn(0x10, 0x1b) | 0x04 )); // set noani-bit
-	#endif
-	I2CTransmitWord(0x10, 0x0201);   // reset XBOX
-	while(1);
-}
-
-void AdvancedMenu(void *textmenu) {
-	TextMenu((TEXTMENU*)textmenu, NULL);
 }
 
 void BootFromCD(void *data) {

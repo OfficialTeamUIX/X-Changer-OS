@@ -11,6 +11,7 @@
 #include "TextMenu.h"
 
 #include "VideoInitialization.h"
+#include "MenuActions.h"
 
 TEXTMENU *TextMenuInit(void) {
 	
@@ -19,47 +20,39 @@ TEXTMENU *TextMenuInit(void) {
 	
 	//Create the root menu - MANDATORY
 	menuPtr = malloc(sizeof(TEXTMENU));
-	strcpy(menuPtr->szCaption, "Main Menu");
+	strcpy(menuPtr->szCaption, "XC OS for XBOX 1.0-1.6");
 	menuPtr->firstMenuItem=NULL;
 	
-	//LED control menu
+	//Boot Originalbios
 	itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
 	memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
-	strcpy(itemPtr->szCaption, "LED Control Menu");
-	itemPtr->functionPtr=DrawChildTextMenu;
-	itemPtr->functionDataPtr = (void *)LEDMenuInit();
+	strcpy(itemPtr->szCaption, "Boot Original Bios");
+	itemPtr->functionPtr = BootOriginalBios;
+	itemPtr->functionDataPtr = NULL;
 	TextMenuAddItem(menuPtr, itemPtr);
 	
-	//VIDEO SETTINGS MENU
+	//Boot 256k Modbios
 	itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
 	memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
-	strcpy(itemPtr->szCaption, "Video Settings");
-	itemPtr->functionPtr=DrawChildTextMenu;
-	itemPtr->functionDataPtr = (void *)VideoMenuInit();
+	strcpy(itemPtr->szCaption, "Boot Bank A (256k)");
+	itemPtr->functionPtr = BootModBios;
+	itemPtr->functionDataPtr = NULL;
 	TextMenuAddItem(menuPtr, itemPtr);
 
-	//HDD MENU
+	//Boot 512k Modbios
 	itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
 	memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
-	strcpy(itemPtr->szCaption, "Hdd Menu");
-	itemPtr->functionPtr=DrawChildTextMenu;
-	itemPtr->functionDataPtr = (void *)HddMenuInit();
+	strcpy(itemPtr->szCaption, "Boot Bank B (512k)");
+	itemPtr->functionPtr = BootModBios2;
+	itemPtr->functionDataPtr = NULL;
 	TextMenuAddItem(menuPtr, itemPtr);
 	
-#ifdef FLASH
-	//FLASH MENU
+	//Advanced Menu
 	itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
 	memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
-	strcpy(itemPtr->szCaption, "Flash Menu");
+	strcpy(itemPtr->szCaption, "Advanced Menu");
 	itemPtr->functionPtr=DrawChildTextMenu;
-	itemPtr->functionDataPtr = (void *)FlashMenuInit();
-	TextMenuAddItem(menuPtr, itemPtr);
-#endif
-	itemPtr = (TEXTMENUITEM*)malloc(sizeof(TEXTMENUITEM));
-	memset(itemPtr,0x00,sizeof(TEXTMENUITEM));
-	strcpy(itemPtr->szCaption, "Reset Menu");
-	itemPtr->functionPtr=DrawChildTextMenu;
-	itemPtr->functionDataPtr = (void *)ResetMenuInit();
+	itemPtr->functionDataPtr = (void *)AdvancedMenuInit();
 	TextMenuAddItem(menuPtr, itemPtr);
 	
 	return menuPtr;

@@ -413,7 +413,7 @@ int LoadKernelCdrom(CONFIGENTRY *config) {
 
 
 #ifdef FLASH 
-int BootLoadFlashCD(int cdromId) {
+int BootLoadFlashCD(int cdromId, int ExpectedFileSize) {
 	
 	u32 dwConfigSize=0;
 	int n;
@@ -479,7 +479,7 @@ int BootLoadFlashCD(int cdromId) {
 	}
 	//printk("\n\nCDROM: ");
 	//printk("Loading bios image from CDROM:/image.bin. \n");
-	dwConfigSize=BootIso9660GetFile(cdromId, "/image.bin", (u8 *)KERNEL_PM_CODE, 	256*1024);
+	dwConfigSize=BootIso9660GetFile(cdromId, "/image.bin", (u8 *)KERNEL_PM_CODE, ExpectedFileSize);
 	
 	if( dwConfigSize < 0 ) { //It's not there
 		printk("\n\n                    image.bin not found on CDROM... Halting\n");
@@ -487,8 +487,8 @@ int BootLoadFlashCD(int cdromId) {
 	}
 
 	printk("\n\n                    Image size: %i\n", dwConfigSize);
-        if (dwConfigSize!=256*1024) {
-		printk("                    Image is not a 256kB image - aborted\n");
+        if (dwConfigSize!=ExpectedFileSize) {
+		printk("                    Image is not a %dkB image - aborted\n",ExpectedFileSize/1024);
 		while (1);
 	}
 	SHA1Reset(&context);
@@ -496,6 +496,7 @@ int BootLoadFlashCD(int cdromId) {
 	SHA1Result(&context,SHA1_result);
 	memcpy(checksum,SHA1_result,20);
 	printk("                    Result code: %d\n", BootReflashAndReset((u8*) KERNEL_PM_CODE, (u32) 0, (u32) dwConfigSize));
+	while(1);
 /*	
 	SHA1Reset(&context);	
 	SHA1Input(&context,(void *)LPCFlashadress,dwConfigSize);
@@ -512,6 +513,7 @@ int BootLoadFlashCD(int cdromId) {
 	return 0;
 }
 #endif //Flash
+
 
 #ifdef FLASH 
 int BootLoadUpdateFlash(int cdromId) {
@@ -542,9 +544,11 @@ int BootLoadUpdateFlash(int cdromId) {
 		I2CTransmitWord(0x10, 0x0c00); // eject DVD tray
 		wait_ms(2000); // Wait for DVD to become responsive to inject command
 			
-		VIDEO_ATTR=0xff000000+TEXTCOLOR;
-		VIDEO_CURSOR_POSY += 180;
-		printk("\n\n\n\2X-Changer UPDATE: Insert disk and press A\2\n");
+		//VIDEO_ATTR=0xff000000+TEXTCOLOR;
+		//VIDEO_CURSOR_POSY += 180;
+		ClearScreen();
+		printk("\n\n\n\n\n\n\n\n\n\n");
+		printk("                    X-Changer UPDATE: Insert disk and press A\n");
 
 		while(1) {
 			if (risefall_xpad_BUTTON(TRIGGER_XPAD_KEY_A) == 1) {
@@ -567,9 +571,11 @@ int BootLoadUpdateFlash(int cdromId) {
 		}
 	}
 	else {
-		VIDEO_ATTR=0xff000000+TEXTCOLOR;
-		VIDEO_CURSOR_POSY += 180;
-		printk("\n\n\n\2Valid file found\2\n");
+		//VIDEO_ATTR=0xff000000+TEXTCOLOR;
+		//VIDEO_CURSOR_POSY += 180;
+		ClearScreen();
+		printk("\n\n\n\n\n\n\n\n\n\n");
+		printk("                    Valid file found\n");
 		VIDEO_ATTR=0xff000000+TEXTCOLOR;
 	}
 	//printk("\n\nCDROM: ");
@@ -577,13 +583,13 @@ int BootLoadUpdateFlash(int cdromId) {
 	dwConfigSize=BootIso9660GetFile(cdromId, "/update.bin", (u8 *)KERNEL_PM_CODE, 	256*1024);
 	
 	if( dwConfigSize < 0 ) { //It's not there
-		printk("\n\nupdate.bin not found on CDROM... Halting\n");
+		printk("\n\n                    update.bin not found on CDROM... Halting\n");
 		while(1) ;
 	}
 
-	printk("\n\nFile size: %i\n", dwConfigSize);
+	printk("\n\n                    File size: %i\n", dwConfigSize);
         if (dwConfigSize!=256*1024) {
-		printk("File is not 256k - aborted\n");
+		printk("                    File is not 256k - aborted\n");
 		while (1);
 	}
 	SHA1Reset(&context);

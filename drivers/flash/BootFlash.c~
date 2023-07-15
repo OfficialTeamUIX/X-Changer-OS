@@ -389,7 +389,7 @@ bool BootFlashProgram( OBJECT_FLASH *pof, u8 *pba )
 
 		dwLen--; dw++; dwSrc++;
 	}
-
+/*
 	if(pof->m_pcallbackFlash!=NULL) if(!(pof->m_pcallbackFlash)(pof, EE_PROGRAM_END, 0, 0)) return false;
 
 		// verify
@@ -412,6 +412,7 @@ bool BootFlashProgram( OBJECT_FLASH *pof, u8 *pba )
 	}
 
 	if(pof->m_pcallbackFlash!=NULL) if(!(pof->m_pcallbackFlash)(pof, EE_VERIFY_END, 0, 0)) return false;
+*/	
 	return true;
 }
 

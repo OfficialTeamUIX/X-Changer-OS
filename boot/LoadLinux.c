@@ -413,7 +413,7 @@ int LoadKernelCdrom(CONFIGENTRY *config) {
 
 
 #ifdef FLASH 
-int BootLoadFlashCD(int cdromId) {
+int BootLoadFlashCD(int cdromId, int ExpectedFileSize) {
 	
 	u32 dwConfigSize=0;
 	int n;
@@ -479,7 +479,7 @@ int BootLoadFlashCD(int cdromId) {
 	}
 	//printk("\n\nCDROM: ");
 	//printk("Loading bios image from CDROM:/image.bin. \n");
-	dwConfigSize=BootIso9660GetFile(cdromId, "/image.bin", (u8 *)KERNEL_PM_CODE, 	256*1024);
+	dwConfigSize=BootIso9660GetFile(cdromId, "/image.bin", (u8 *)KERNEL_PM_CODE, ExpectedFileSize);
 	
 	if( dwConfigSize < 0 ) { //It's not there
 		printk("\n\n                    image.bin not found on CDROM... Halting\n");
@@ -487,8 +487,8 @@ int BootLoadFlashCD(int cdromId) {
 	}
 
 	printk("\n\n                    Image size: %i\n", dwConfigSize);
-        if (dwConfigSize!=256*1024) {
-		printk("                    Image is not a 256kB image - aborted\n");
+        if (dwConfigSize!=ExpectedFileSize) {
+		printk("                    Image is not a %dkB image - aborted\n",ExpectedFileSize/1024);
 		while (1);
 	}
 	SHA1Reset(&context);
@@ -512,6 +512,7 @@ int BootLoadFlashCD(int cdromId) {
 	return 0;
 }
 #endif //Flash
+
 
 #ifdef FLASH 
 int BootLoadUpdateFlash(int cdromId) {

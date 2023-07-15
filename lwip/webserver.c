@@ -38,6 +38,8 @@
 
 #include "lwip/tcp.h"
 
+extern int GlobalExpectedFlashFileSize;
+
 struct http_state {
 	unsigned char retries;
 	char *file;
@@ -285,7 +287,7 @@ handle_post(struct http_state *hs)
 		}
 	}
 	if (!start) {
-		printk ("Could not find start...\n");
+		printk ("                    Could not find start...\n");
 		return 0;
 	}
 
@@ -297,7 +299,7 @@ handle_post(struct http_state *hs)
 	}
 
 	if (!end) {
-		printk ("Could not find end...\n");
+		printk ("                    Could not find end...\n");
 		return 0;
 	}
 
@@ -306,11 +308,12 @@ handle_post(struct http_state *hs)
 	len = end - start;
 
 
-	//if (len != 256*1024 && len != 512*1024 && len != 1024*1024) {
-	if (len != 256*1024) {
+	if (len != GlobalExpectedFlashFileSize) {
 		hs->file = http_files[3].data;
 		hs->left = http_files[3].len;
-		printk ("Illegal size, NOT flashing\n");
+		printk ("                    Illegal size, NOT flashing\n");
+		printk ("                    Submitted File is %d Bytes\n", len);
+		printk ("                    Expected File Size: %d kB\n", GlobalExpectedFlashFileSize/1024);
 		return 0;
 	}
 

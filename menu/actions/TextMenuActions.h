@@ -1,5 +1,3 @@
-#ifndef _MENUACTIONS_H_
-#define _MENUACTIONS_H_
 /***************************************************************************
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -23,8 +21,6 @@ void DrawChildTextMenu(void *menu);
 
 void SetWidescreen(void *);
 void SetVideoStandard(void *);
-//void SetLEDColor(void *);
-
 
 void DrawBootMenu(void *entry);
 void BootMenuEntry(void *entry);
@@ -38,6 +34,4 @@ void FlashBios(void *);
 
 #ifdef ETHERBOOT
 void BootFromEtherboot(void *);
-#endif
-
 #endif

@@ -31,7 +31,7 @@ const KNOWN_FLASH_TYPE aknownflashtypesDefault[] = {
 	{ 0xad, 0xb0, "Hynix - HY29F002TT-90",0x40000 },
 	{ 0xad, 0xd5, "Hynix - HY29F080",0x100000 },
 	{ 0xbf, 0x61, "SST SST49LF020",0x40000 },
-	{ 0xbf, 0xd7, "X-Changer",0x40000 },
+	{ 0xbf, 0xd7, "X-Changer V3",0x80000 },
 	{ 0xc2, 0x36, "Macronix - MX29F022NTPC",0x40000 },
 	{ 0xda, 0x0b, "Winbond - W49F002U",0x40000 },
 	{ 0xda, 0x8c, "Winbond W49F020",0x40000 },
@@ -164,15 +164,14 @@ int BootReflashAndReset(u8 *pbNewData, u32 dwStartOffset, u32 dwLength)
 	return 0; // keep compiler happy
 }
 
-bool WriteStatusRegister( u8 value ){
-  OBJECT_FLASH of;
-  of.m_pbMemoryMappedStartAddress = (u8 *)LPCFlashadress;
-  return AccessStatusRegister(&of, value);
-}
-
 u8 GetByteFromFlash(int myaddress) {
   OBJECT_FLASH of;
   of.m_pbMemoryMappedStartAddress = (u8 *)LPCFlashadress;
   return xGetByteFromFlash(&of, myaddress);
+}
+
+void WriteToIO(u16 _port, u8 _data)
+{
+   __asm__ ("out %%al, %%dx" : : "a" (_data), "d" (_port));
 }
 

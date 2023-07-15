@@ -15,7 +15,7 @@
 #define ADVANCED_MENU
 
 //Time to wait in seconds before auto-selecting default item
-#define BOOT_TIMEWAIT 15
+#define BOOT_TIMEWAIT 0
 
 //Uncomment to make connected Xpads rumble briefly at init.
 //#define XPAD_VIBRA_STARTUP

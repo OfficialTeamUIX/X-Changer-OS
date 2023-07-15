@@ -416,27 +416,6 @@ bool BootFlashProgram( OBJECT_FLASH *pof, u8 *pba )
 	return true;
 }
 
-bool AccessStatusRegister( OBJECT_FLASH *statregpointer, u8 value) {
-  u8 i;
-  
-  // Reset CPLD- and Flash-StateMachine
-  statregpointer->m_pbMemoryMappedStartAddress[0x5555]=0xf0;
-  statregpointer->m_pbMemoryMappedStartAddress[0x5555]=0xaa;
-  statregpointer->m_pbMemoryMappedStartAddress[0x2aaa]=0x55;
-  statregpointer->m_pbMemoryMappedStartAddress[0x5555]=0xf0;
-
-  // Unlock und write Status Register
-  for (i = 0; i < 16; i++) statregpointer->m_pbMemoryMappedStartAddress[i] = ((value & 0x0F)<<4) + (i & 0x0F);
-
-  // Reset CPLD- and Flash-StateMachine
-  statregpointer->m_pbMemoryMappedStartAddress[0x5555]=0xf0;
-  statregpointer->m_pbMemoryMappedStartAddress[0x5555]=0xaa;
-  statregpointer->m_pbMemoryMappedStartAddress[0x2aaa]=0x55;
-  statregpointer->m_pbMemoryMappedStartAddress[0x5555]=0xf0;
-
-  return true;
-} 
-
 u8 xGetByteFromFlash(OBJECT_FLASH *myflash, int myaddress) {
   return myflash->m_pbMemoryMappedStartAddress[myaddress]; }
 

@@ -129,7 +129,7 @@ void IconMenu(void) {
 	VIDEO_CURSOR_POSX=((110+nModeDependentOffset)<<2);
 	VIDEO_CURSOR_POSY=nTempCursorY-200;
 	VIDEO_ATTR=0xff000000+WELCOMECOLOR;
-	printk("\2Welcome to X-Changer v2.2");
+//	printk("\2Welcome to X-Changer v3.0");
 //	VIDEO_CURSOR_POSX=((200+nModeDependentOffset)<<2);
 //	VIDEO_CURSOR_POSY=nTempCursorY-150;
 //	VIDEO_ATTR=0xff000000+WELCOMECOLOR;
@@ -138,7 +138,7 @@ void IconMenu(void) {
 	VIDEO_CURSOR_POSX=((252+nModeDependentOffset)<<2);
 	VIDEO_CURSOR_POSY=nTempCursorY-100;
 
-//#ifndef SILENT_MODE
+#ifndef SILENT_MODE
 	//In silent mode, don't draw the menu the first time.
 	//If we get a left/right xpad event, it will be registered,
 	//and the menu will 'appear'. Otherwise, it will proceed quietly
@@ -147,7 +147,7 @@ void IconMenu(void) {
 	printk("Select from Menu\n");
 	VIDEO_ATTR=0xff000000+TEXTCOLOR;
 	IconMenuDraw(nModeDependentOffset, nTempCursorY);
-//#endif
+#endif
 	COUNT_start = IoInputDword(0x8008);
 	//Main menu event loop.
 	while(1)
@@ -195,6 +195,9 @@ void IconMenu(void) {
 		//if (temp!=0) {
 		//	temp = IoInputDword(0x8008) - COUNT_start;
 		//}
+		// added for timeout in any case in order
+		// to start the textmenu at timeout
+		temp = IoInputDword(0x8008) - COUNT_start;
 		
 		if ((risefall_xpad_BUTTON(TRIGGER_XPAD_KEY_A) == 1) || risefall_xpad_BUTTON(TRIGGER_XPAD_KEY_START) == 1 || 
 				(u32)(temp>(0x369E99*BOOT_TIMEWAIT))) {

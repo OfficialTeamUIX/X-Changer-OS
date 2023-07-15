@@ -12,8 +12,11 @@
 // Booting Original Bios
 void BootOriginalBios(void *);
 
-// Booting Modbios
+// Booting 256k Modbios
 void BootModBios(void *);
+
+// Booting 512k Modbios
+void BootModBios2(void *);
 
 //For the icon->text menu jump
 void AdvancedMenu(void *menu);
